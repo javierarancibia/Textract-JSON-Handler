@@ -11,13 +11,20 @@ const structuredTables = tables.map(table => {
         id: table.Id,
         data: table.Relationships[0].Ids.map(id => ({id, cell: cellsDictionary.find(cell => cell.Id === id) }))
     }) 
-}) 
-const rowedTable = structuredTables.map((table) => {
-    return ({
-        rowIndex: i + 1,
-        // data: 
-    })
 })
+
+// const rowedTable = structuredTables.map((table, i, array) => {
+//     if (table.EntityTypes && table.EntityTypes.some(type => type === 'COLUMN_HEADER')) {
+//         if (!array.some(x => x.type === "headers")) {
+//             return ({ type: "headers", data })
+//         }
+//         return ({ type: "headers" })
+//     }
+//     return ({
+//         rowIndex: i + 1,
+//         // data: 
+//     })
+// })
 console.log(structuredTables[0].data)
 
 
