@@ -12,6 +12,12 @@ const structuredTables = tables.map(table => {
         data: table.Relationships[0].Ids.map(id => ({id, cell: cellsDictionary.find(cell => cell.Id === id) }))
     }) 
 }) 
+const rowedTable = structuredTables.map((table) => {
+    return ({
+        rowIndex: i + 1,
+        // data: 
+    })
+})
 console.log(structuredTables[0].data)
 
 
