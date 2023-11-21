@@ -13,13 +13,24 @@ const structuredTables = tables.map(table => {
 })
 
 const rowedTable = structuredTables.map(table => {
-    const headers = table.data.filter(x => 'EntityTypes'in x.cell && x.cell.RowIndex === 1)
+    const headers = table.data.filter(x => 'EntityTypes'in x.cell && x.cell.EntityTypes.includes("COLUMN_HEADER"))
     const tableCells = table.data.filter(x => x.cell.RowIndex !== 1)
+    const tableRows = tableCells.reduce((acc, item) => {
+        // If the array for the current rowIndex doesn't exist, create it
+        if (!acc[item.cell.RowIndex]) {
+          acc[item.cell.RowIndex] = [];
+        }
+      
+        // Push the current item to the array for the current rowIndex
+        acc[item.cell.RowIndex].push({ id: item.id, cell: item.cell });
+        return acc;
+    }, []).filter(x => x !== 'undefined');
+
     // Crear array para cada 
-    return ({ type: "table", headers, tableCells })
+    return ({ type: "table", headers, tableRows })
 })
 
-console.log(rowedTable)
+console.log(rowedTable[0])
 
 
 
