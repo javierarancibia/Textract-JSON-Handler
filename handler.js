@@ -1,8 +1,8 @@
 const response = require('./response.js');
 
 const wordsDictionary = response.Blocks.filter((block) => block.BlockType === 'WORD').map((word) => ({ id: word.Id, confidence: word.Confidence, text: word.Text }));
-const cells = response.Blocks.filter(block => block.BlockType === 'CELL')
-const cellsDictionary = cells.map(cell => ({...cell, word: wordsDictionary.find(word => word.id === cell.Relationships[0].Ids[0]) }))
+const cells = response.Blocks.filter(block => block.BlockType === 'CELL') // JUNTAR CELL Y MERGED_CELLS PARA RECORRER CONJUNTO DE PALABRAS Y SPAN
+const cellsDictionary = cells.map(cell => ({...cell, word: cell.Relationships && wordsDictionary.find(word => word.id === cell.Relationships[0].Ids[0]) }))
 
 const tables = response.Blocks.filter((block) => block.BlockType === 'TABLE');
 const structuredTables = tables.map(table => {
@@ -39,11 +39,11 @@ const createTable = rowedTable => {
         }
         let tbody;
         if (element.tableRows) {
-            const tr = element.tableRows.map(row => (`<tr>${ row.map(data => (`<td style="background-color: ${data.cell.word.confidence < 70 ? "red" : "transparent"}">${ data.cell.word.text }</td>`)).join('') }</tr>`))
+            const tr = element.tableRows.map(row => (`<tr>${ row.map(data => data.cell.word && (`<td style="background-color: ${data.cell.word.confidence < 70 ? "red" : "transparent"}">${ data.cell.word.text }</td>`)).join('') }</tr>`))
             tbody = `<tbody>${ tr.join('') }</tbody>`
         }
 
-        return thead + tbody
+        return '<table>' + thead + tbody + '</table>'
     });
 }
 console.log(createTable(rowedTable))
