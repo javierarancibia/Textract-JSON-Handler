@@ -32,12 +32,18 @@ const rowedTable = structuredTables.map(table => {
 
 const createTable = rowedTable => {
     return rowedTable.map(element => {
-        let theaders;
+        let thead;
         if (element.headers) {
             const th = element.headers.map(header => (`<th style="background-color: ${header.cell.word.confidence < 70 ? "red" : "transparent"}">${header.cell.word.text}</th>`))
-            theaders = `<tr>${th.join('')}</tr>`
+            thead = `<thead><tr>${ th.join('') }</tr></thead>`
         }
-        return theaders
+        let tbody;
+        if (element.tableRows) {
+            const tr = element.tableRows.map(row => (`<tr>${ row.map(data => (`<td style="background-color: ${data.cell.word.confidence < 70 ? "red" : "transparent"}">${ data.cell.word.text }</td>`)).join('') }</tr>`))
+            tbody = `<tbody>${ tr.join('') }</tbody>`
+        }
+
+        return thead + tbody
     });
 }
 console.log(createTable(rowedTable))
