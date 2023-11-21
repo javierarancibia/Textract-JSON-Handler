@@ -27,10 +27,20 @@ const rowedTable = structuredTables.map(table => {
     }, []).filter(x => x !== 'undefined');
 
     // Crear array para cada 
-    return ({ type: "table", headers, tableRows })
+    return ({ type: "table", id: table.id, headers, tableRows })
 })
 
-console.log(rowedTable[0])
+const createTable = rowedTable => {
+    return rowedTable.map(element => {
+        let theaders;
+        if (element.headers) {
+            const th = element.headers.map(header => (`<th style="background-color: ${header.cell.word.confidence < 70 ? "red" : "transparent"}">${header.cell.word.text}</th>`))
+            theaders = `<tr>${th.join('')}</tr>`
+        }
+        return theaders
+    });
+}
+console.log(createTable(rowedTable))
 
 
 
