@@ -51,7 +51,7 @@ const createTable = rowedTable => {
         }
         let tbody;
         if (element.tableRows) {
-            const tr = element.tableRows.map(row => (`<tr>${ row.map(data => (`<td style="border: 1px solid #dddddd; min-width:100px; text-align:center" colspan=${data.cell.ColumnSpan}>${ data.cell.word ? data.cell.word.map(el => el && el.text !== undefined ? el.text : " ").join(' ') : " " }</td>`) )}</tr>`))
+            const tr = element.tableRows.map(row => (`<tr>${ row.map(data => data.cell.word ? (`<td style="border: 1px solid #dddddd; min-width:100px; text-align:center;background:${data.cell.Confidence < 90 ? "red" : "transparent"}" colspan=${data.cell.ColumnSpan}>${ data.cell.word.map(el => el && el.text !== undefined ? el.text : " ").join(' ') }</td>`) : "<td style='border: 1px solid #dddddd; min-width:100px;background:${data.cell.Confidence < 90 ? 'red' : 'transparent''></td>").join('')  }</tr>`))
             tbody = `<tbody>${ tr.join('') }</tbody>`
         }
         let tfooter;
