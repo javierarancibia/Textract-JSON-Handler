@@ -34,7 +34,7 @@ const rowedTable = structuredTables.map(table => {
 })
 
 const createTable = rowedTable => {
-    return rowedTable.map(element => {
+    const parsedTables =  rowedTable.map(element => {
         let tableTitles;
         if (!element.titles) {
             tableTitles = ""
@@ -64,8 +64,9 @@ const createTable = rowedTable => {
 
         return tableTitles + '<table style="margin: 3rem 0;">' + thead + tbody + tfooter + '</table>'
     });
+    return parsedTables.join("")
 }
-console.log(createTable(rowedTable).join(""))
+console.log(createTable(rowedTable))
 
 
 
