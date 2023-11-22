@@ -1,4 +1,4 @@
-const response = require('./response.js');
+const response = require('./response2.js');
 
 const wordsDictionary = response.Blocks.filter((block) => block.BlockType === 'WORD').map((word) => ({ id: word.Id, confidence: word.Confidence, text: word.Text }));
 const cells = response.Blocks.filter(block => block.BlockType === 'CELL' || block.BlockType === 'MERGED_CELL' || block.BlockType === 'TABLE_TITLE' || block.BlockType === 'TABLE_FOOTER' )
