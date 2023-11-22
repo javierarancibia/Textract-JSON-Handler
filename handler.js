@@ -1,6 +1,7 @@
-const response = require('./response2.js');
+const response = require('./response3.js');
 
 const wordsDictionary = response.Blocks.filter((block) => block.BlockType === 'WORD').map((word) => ({ id: word.Id, confidence: word.Confidence, text: word.Text }));
+console.log(wordsDictionary)
 const cells = response.Blocks.filter(block => block.BlockType === 'CELL' || block.BlockType === 'MERGED_CELL' || block.BlockType === 'TABLE_TITLE' || block.BlockType === 'TABLE_FOOTER' )
 const cellsDictionary = cells.map(cell => ({...cell, word: cell.Relationships && cell.Relationships[0].Ids.map(id => wordsDictionary.find(el => el.id === id)) }))
 
@@ -50,7 +51,7 @@ const createTable = rowedTable => {
         }
         let tbody;
         if (element.tableRows) {
-            const tr = element.tableRows.map(row => (`<tr>${ row.map(data => data.cell.word ? (`<td colspan=${data.cell.ColumnSpan}>${ data.cell.word.map(el => el.text).join(' ') }</td>`): "<td></td>").join('')  }</tr>`))
+            const tr = element.tableRows.map(row => (`<tr>${ row.map(data => (`<td style="border: 1px solid #dddddd; min-width:100px; text-align:center" colspan=${data.cell.ColumnSpan}>${ data.cell.word ? data.cell.word.map(el => el && el.text !== undefined ? el.text : " ").join(' ') : " " }</td>`) )}</tr>`))
             tbody = `<tbody>${ tr.join('') }</tbody>`
         }
         let tfooter;
@@ -66,7 +67,7 @@ const createTable = rowedTable => {
     });
     return parsedTables.join("")
 }
-console.log(createTable(rowedTable))
+createTable(rowedTable)
 
 
 
