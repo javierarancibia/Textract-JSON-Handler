@@ -35,7 +35,10 @@ const rowedTable = structuredTables.map(table => {
 
 const createTable = rowedTable => {
     return rowedTable.map(element => {
-        let tableTitles; 
+        let tableTitles;
+        if (!element.titles) {
+            tableTitles = ""
+        }
         if (element.titles) {
             const titles = element.titles.map(title => title.cell.word.map(x => x.text).join(' '))
             tableTitles = `<h2>${ titles }</h2>`
@@ -51,6 +54,9 @@ const createTable = rowedTable => {
             tbody = `<tbody>${ tr.join('') }</tbody>`
         }
         let tfooter;
+        if (!element.footer) {
+            tfooter = ""
+        }
         if (element.footer) {
             const foot = element.footer.map(foot => foot.cell.word && (`<td colspan=${foot.cell.ColumnSpan}>${foot.cell.word.map(el => el.text).join(' ')}</td>`))
             tfooter = `<tfoot><tr>${ foot.join('') }</tr></tfoot>`
@@ -59,7 +65,7 @@ const createTable = rowedTable => {
         return tableTitles + '<table style="margin: 3rem 0;">' + thead + tbody + tfooter + '</table>'
     });
 }
-console.log(createTable(rowedTable))
+console.log(createTable(rowedTable).join(""))
 
 
 
