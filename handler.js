@@ -1,9 +1,11 @@
-const response = require('./response3.js');
+const response = require('./response.js');
 
 const wordsDictionary = response.Blocks.filter((block) => block.BlockType === 'WORD').map((word) => ({ id: word.Id, confidence: word.Confidence, text: word.Text }));
-console.log(wordsDictionary)
 const cells = response.Blocks.filter(block => block.BlockType === 'CELL' || block.BlockType === 'MERGED_CELL' || block.BlockType === 'TABLE_TITLE' || block.BlockType === 'TABLE_FOOTER' )
 const cellsDictionary = cells.map(cell => ({...cell, word: cell.Relationships && cell.Relationships[0].Ids.map(id => wordsDictionary.find(el => el.id === id)) }))
+
+const mergedCells = response.Blocks.filter(block => block.BlockType === 'MERGED_CELL')
+const findMergedCell = id => mergedCells.find(mergedCell => mergedCell.Relationships[0].Ids.includes(id));
 
 const tables = response.Blocks.filter((block) => block.BlockType === 'TABLE');
 const structuredTables = tables.map(table => {
@@ -29,7 +31,6 @@ const rowedTable = structuredTables.map(table => {
         acc[item.cell.RowIndex].push({ id: item.id, cell: item.cell });
         return acc;
     }, []).filter(x => x !== 'undefined');
-
     // Crear array para cada 
     return ({ type: "table", id: table.id, titles: tableTitles?.ids, headers, tableRows, footer: tableFooters?.ids })
 })
@@ -51,8 +52,20 @@ const createTable = rowedTable => {
         }
         let tbody;
         if (element.tableRows) {
-            const tr = element.tableRows.map(row => (`<tr>${ row.map(data => data.cell.word ? (`<td style="border: 1px solid #dddddd; min-width:100px; text-align:center;background:${data.cell.Confidence < 90 ? "red" : "transparent"}" colspan=${data.cell.ColumnSpan}>${ data.cell.word.map(el => el && el.text !== undefined ? el.text : " ").join(' ') }</td>`) : "<td style='border: 1px solid #dddddd; min-width:100px;background:${data.cell.Confidence < 90 ? 'red' : 'transparent''></td>").join('')  }</tr>`))
-            tbody = `<tbody>${ tr.join('') }</tbody>`
+            const trObjects = element.tableRows.map(row => {
+                return row.map(data => {
+                    if (findMergedCell(data.id)) {
+                        const mergedCell = findMergedCell(data.id) 
+                        return {id: mergedCell.Id, colSpan: mergedCell.ColumnSpan, rowSpan: mergedCell.RowSpan, text: mergedCell.Relationships[0].Ids.map(id => cellsDictionary.find(el => el.Id === id)).map(x => x.word?.map(item => item.text).filter(item => item !== undefined)) }
+                    }
+                    return { id: data.cell.Id, colSpan: 1, rowSpan: 1, text: data.cell.word ? data.cell.word.map(el => el && el.text !== undefined ? el.text : " ") : "" }
+                })
+            })
+            const tr = trObjects.map(tRow => {
+                const duplicatesRemoved = tRow.filter((obj, index, arr) => arr.findIndex(o => o.id === obj.id) === index) 
+                return `<tr> ${duplicatesRemoved.map(x => `<td colspan="${x.colSpan} rowspan="${x.rowSpan}"> ${x.text} </td>`)} </tr>` 
+            })
+            console.log(tr)
         }
         let tfooter;
         if (!element.footer) {
@@ -68,8 +81,6 @@ const createTable = rowedTable => {
     return parsedTables.join("")
 }
 createTable(rowedTable)
-
-
 
 
 
