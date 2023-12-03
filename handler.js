@@ -21,7 +21,7 @@ const rowedTable = structuredTables.map(table => {
     const childArray = table.data.find(x => x.type === "CHILD")
     const headers = childArray.ids.filter(x => 'EntityTypes'in x.cell && x.cell.EntityTypes.includes("COLUMN_HEADER"))
     const tableCells = childArray.ids.filter(x => !('EntityTypes'in x.cell) || 'EntityTypes'in x.cell && x.cell.EntityTypes.includes("TABLE_SECTION_TITLE")  || 'EntityTypes'in x.cell && x.cell.EntityTypes.includes("TABLE_SUMMARY"))
-    const tableRows = tableCells.reduce((acc, item) => {
+    const tableRows = childArray.ids.reduce((acc, item) => {
         // If the array for the current rowIndex doesn't exist, create it
         if (!acc[item.cell.RowIndex]) {
           acc[item.cell.RowIndex] = [];
@@ -55,8 +55,14 @@ const createTable = rowedTable => {
             const trObjects = element.tableRows.map(row => {
                 return row.map(data => {
                     if (findMergedCell(data.id)) {
-                        const mergedCell = findMergedCell(data.id) 
-                        return {id: mergedCell.Id, colSpan: mergedCell.ColumnSpan, rowSpan: mergedCell.RowSpan, text: mergedCell.Relationships[0].Ids.map(id => cellsDictionary.find(el => el.Id === id)).map(x => x.word?.map(item => item.text).filter(item => item !== undefined)) }
+                        const mergedCell = findMergedCell(data.id)
+                        const stringHandler = text => text.filter(element => element !== undefined).flat().join(' ');
+                        return {
+                            id: mergedCell.Id, 
+                            colSpan: mergedCell.ColumnSpan, 
+                            rowSpan: mergedCell.RowSpan, 
+                            text: stringHandler(mergedCell.Relationships[0].Ids.map(id => cellsDictionary.find(el => el.Id === id)).map(x => x.word?.map(item => item.text)))
+                        }
                     }
                     return { id: data.cell.Id, colSpan: 1, rowSpan: 1, text: data.cell.word ? data.cell.word.map(el => el && el.text !== undefined ? el.text : " ") : "" }
                 })
@@ -76,7 +82,7 @@ const createTable = rowedTable => {
             tfooter = `<tfoot><tr>${ foot.join('') }</tr></tfoot>`
         }
 
-        return tableTitles + '<table style="margin: 3rem 0;">' + thead + tbody + tfooter + '</table>'
+        return tableTitles + '<table style="margin: 3rem 0;">' +  tbody + tfooter + '</table>'
     });
     return parsedTables.join("")
 }
